@@ -1,0 +1,79 @@
+import pygame
+import sys
+import os
+from pygame.locals import *
+
+pygame.init()
+
+pygame.display.set_caption('duck tales')
+
+screen = pygame.display.set_mode((1000,1000))
+
+clock = pygame.time.Clock()
+
+
+player = pygame.Rect((300, 250,50,50))
+running = True
+
+tile_size = 200
+
+class World():
+    def __init__(self,data):
+        self.tile_list = []
+
+        dirt_img = pygame.image.load('360_F_417154464_XWjVtPxASXXlFIPUvQtoMOeJ8ky38Q6W.jpg')
+        row_count = 0
+        for row in data:
+            col_count = 0
+            for tile in row:
+                if tile == 1:
+                    img = pygame.transform.scale(dirt_img,(tile_size,tile_size))
+                    img_rect = img.get_rect()
+                    img_rect.x = col_count * tile_size
+                    img_rect.y = row_count * tile_size
+                    tile = (img, img_rect)
+                    self.tile_list.append(tile)
+                col_count += 1
+            row_count += 1
+def draw(self):
+    for tile in self.tile_list:
+        screen.blit(tile[0], tile[1])
+#tiles for putting in platforms
+world_data = [
+[1,1,1,1,1],
+[1,0,0,0,1],
+[1,0,0,0,1],
+[1,0,0,0,1],
+[1,1,1,1,1],
+]
+
+world = World(world_data)
+
+while running:
+
+    screen.fill((0,0,0))
+
+    pygame.draw.rect(screen,(255,0,0), player)
+
+    draw(world)
+
+    key = pygame.key.get_pressed()
+
+    if key[pygame.K_a]:
+        player.move_ip(-1,0)
+    elif key[pygame.K_d]:
+        player.move_ip(1,0)
+    elif key[pygame.K_w]:
+        player.move_ip(0,-1)
+    elif key[pygame.K_s]:
+        player.move_ip(0,1)
+
+    x, y = pygame.mouse.get_pos()
+
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            raise SystemExit
+    pygame.display.update()
+pygame.quit()
