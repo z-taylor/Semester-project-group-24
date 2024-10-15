@@ -1,0 +1,78 @@
+import pygame
+import sys
+import time
+
+pygame.init()
+score = 0
+clock = pygame.time.Clock()
+
+win = pygame.display.set_mode((800, 600))
+green = (34, 139, 34)
+blue = (0, 0, 255)
+
+ground = pygame.Rect(0, 575, 800, 25)
+platforms = [
+    pygame.Rect(100, 500, 150, 5),
+    pygame.Rect(300, 400, 150, 5),
+    pygame.Rect(500, 175, 150, 5),
+    pygame.Rect(200, 250, 150, 5),
+]
+
+
+player = pygame.Rect(50, 450, 30, 30)
+player_speed = 5
+velocity_y = 0
+gravity = 0.8
+on_ground = False
+
+def draw_game():
+    win.fill((255,255,255))
+    pygame.draw.rect(win, green, ground)
+    for platform in platforms:
+        pygame.draw.rect(win, green, platform)
+    pygame.draw.rect(win, blue, player)
+    pygame.display.flip()
+
+def move_player(keys):
+    if keys[pygame.K_LEFT] and player.left > 0:
+        player.x -= player_speed
+    if keys[pygame.K_RIGHT] and player.right < 800:
+        player.x += player_speed
+
+def apply_gravity():
+    global velocity_y, on_ground
+    if not on_ground:
+        velocity_y += gravity
+    player.y += velocity_y
+
+    on_ground = False
+    for platform in [ground] + platforms:
+        if player.colliderect(platform) and velocity_y > 0:
+            player.bottom = platform.top
+            velocity_y = 0
+            on_ground = True
+
+def jump(keys):
+    global velocity_y
+    if keys[pygame.K_SPACE] and on_ground:
+        velocity_y = -15
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+
+    keys = pygame.key.get_pressed()
+    move_player(keys)
+    jump(keys)
+    apply_gravity()
+    if player.top == 0:
+        score += 1
+        print('You win!')
+        time.sleep(2)
+        pygame.quit()
+        sys.exit()
+    draw_game()
+    clock.tick(30)
