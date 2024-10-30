@@ -3,7 +3,6 @@ import sys
 import random
 from pygame.locals import *
 
-# Constants
 TILE_SIZE = 50
 JUMP_HEIGHT = 20
 Y_GRAVITY = 1
@@ -16,19 +15,17 @@ clock = pygame.time.Clock()
 
 pygame.init()
 
-# Game window setup
 pygame.display.set_caption('Platform Game')
 screen = pygame.display.set_mode((1000, 1000))
 
-# Initialize timers
-meteor_timer = pygame.time.get_ticks()  # Timer for meteor spawning
-game_start_time = pygame.time.get_ticks()  # Timer for game start
+meteor_timer = pygame.time.get_ticks()
+game_start_time = pygame.time.get_ticks()
 survival_time = 0
 best_time = 0
-last_spawn_time_reduction = 0  # Track the last time the spawn time was reduced
+last_spawn_time_reduction = 0
 game_over = False
 
-class Meteor:
+class SpacePebble:
     def __init__(self):
         self.size = random.randint(meteor_min_size, meteor_max_size)
         self.rect = self.spawn_meteor()
@@ -36,20 +33,20 @@ class Meteor:
 
     def spawn_meteor(self):
         side = random.choice(['left', 'right'])
-        if side == 'left':  # Spawn at left
+        if side == 'left':
             return pygame.Rect(-self.size, random.randint(0, 1000 - self.size), self.size, self.size)
-        else:  # Spawn at right
+        else:
             return pygame.Rect(1000, random.randint(0, 1000 - self.size), self.size, self.size)
 
     def set_speed(self):
         speed_factor = random.randint(2, 5)
-        if self.rect.top <= 0:  # Moving down from top
+        if self.rect.top <= 0:
             return random.uniform(-2, 2), speed_factor
-        elif self.rect.bottom >= 1000:  # Moving up from bottom
+        elif self.rect.bottom >= 1000:
             return random.uniform(-2, 2), -speed_factor
-        elif self.rect.left <= 0:  # Moving right from left
+        elif self.rect.left <= 0:
             return speed_factor, random.uniform(-2, 2)
-        else:  # Moving left from right
+        else:
             return -speed_factor, random.uniform(-2, 2)
 
     def move(self):
@@ -61,8 +58,8 @@ class Meteor:
 
 class Player:
     def __init__(self, x, y):
-        self.image = pygame.Surface((50, 50))  # Player size
-        self.image.fill((255, 0, 0))  # Red color
+        self.image = pygame.Surface((50, 50))
+        self.image.fill((255, 0, 0))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -76,38 +73,34 @@ class Player:
         dx = 0
         dy = 0
 
-        if keys[pygame.K_a]:  # Move left
+        if keys[pygame.K_a]:
             dx = -X_SPEED
-        if keys[pygame.K_d]:  # Move right
+        if keys[pygame.K_d]:
             dx = X_SPEED
-        if keys[pygame.K_SPACE] and not self.jumping:  # Jump
+        if keys[pygame.K_SPACE] and not self.jumping:
             self.vel_y = -JUMP_HEIGHT
             self.jumping = True
 
-        # Gravity
+
         self.vel_y += Y_GRAVITY
         dy += self.vel_y
 
-        # Check for collision
+
         for tile in world.tile_list:
-            # Check for collision horizontal
             if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.rect.width, self.rect.height):
                 dx = 0
-            # Check for collision vertical
             if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.rect.width, self.rect.height):
                 if self.vel_y > 0:
                     dy = tile[1].top - self.rect.bottom
                     self.vel_y = 0
-                    self.jumping = False  # Allow jumping again after landing
+                    self.jumping = False
                 elif self.vel_y < 0:
                     dy = tile[1].bottom - self.rect.top
                     self.vel_y = 0
 
-        # Player position update
         self.rect.x += dx
         self.rect.y += dy
 
-# Tiles class
 class World:
     def __init__(self, data):
         self.tile_list = []
@@ -133,7 +126,6 @@ class World:
         for tile in self.tile_list:
             screen.blit(tile[0], tile[1])
 
-# World data
 world_data = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -154,12 +146,11 @@ world_data = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
-# Initialize player and world
 world = World(world_data)
 player = Player(500, 8 * TILE_SIZE - 50)
 meteors = []
 
-# Main game loop
+#main
 running = True
 while running:
     screen.fill((0, 0, 0))
@@ -170,29 +161,24 @@ while running:
     player.move(keys, world)
     player.draw(screen)
 
-    # Handle meteor spawning
     if pygame.time.get_ticks() - meteor_timer > spawn_time:
-        meteors.append(Meteor())
-        meteor_timer = pygame.time.get_ticks()  # Reset timer
+        meteors.append(SpacePebble())
+        meteor_timer = pygame.time.get_ticks()
 
-    # Move and draw meteors
     for meteor in meteors[:]:
         meteor.move()
         meteor.draw()
 
-        # Check for collision with player
         if meteor.rect.colliderect(player.rect):
             game_over = True
             best_time = max(survival_time, best_time)
 
-    # Increase difficulty by reducing spawn time every 10 seconds
-    elapsed_time = (pygame.time.get_ticks() - game_start_time) // 1000  # in seconds
+    elapsed_time = (pygame.time.get_ticks() - game_start_time) // 1000
     if elapsed_time > 0 and elapsed_time % 10 == 0 and last_spawn_time_reduction != elapsed_time:
         if spawn_time > 1000:
             spawn_time -= 500
         last_spawn_time_reduction = elapsed_time
 
-    # Check for game over
     if game_over:
         print("Game Over! Best Time: ", best_time)
         break
