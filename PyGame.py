@@ -59,7 +59,7 @@ class SpacePebble:
 class Player:
     def __init__(self, x, y):
         self.image = pygame.Surface((50, 50))
-        self.image.fill((255, 0, 0))
+        self.image.fill((255, 255, 255))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -81,10 +81,8 @@ class Player:
             self.vel_y = -JUMP_HEIGHT
             self.jumping = True
 
-
         self.vel_y += Y_GRAVITY
         dy += self.vel_y
-
 
         for tile in world.tile_list:
             if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.rect.width, self.rect.height):
@@ -101,11 +99,18 @@ class Player:
         self.rect.x += dx
         self.rect.y += dy
 
+        if world.goal_tile and world.goal_tile.colliderect(self.rect):
+            print("You win") # Maybe have a "you win" screen
+            pygame.quit()
+            sys.exit()
+
 class World:
     def __init__(self, data):
         self.tile_list = []
+        self.goal_tile = None  # Makes goal tile different
         dirt_img = pygame.image.load('360_F_417154464_XWjVtPxASXXlFIPUvQtoMOeJ8ky38Q6W.jpg')
         goal_img = pygame.image.load('goal.png')
+        self.goal_img = pygame.transform.scale(goal_img, (TILE_SIZE, TILE_SIZE))  # Scale goal image to tile size
 
         for row_index, row in enumerate(data):
             for col_index, tile in enumerate(row):
@@ -116,18 +121,20 @@ class World:
                     img_rect.y = row_index * TILE_SIZE
                     self.tile_list.append((img, img_rect))
                 elif tile == 2:
-                    img = pygame.transform.scale(goal_img, (TILE_SIZE, TILE_SIZE))
-                    img_rect = img.get_rect()
-                    img_rect.x = col_index * TILE_SIZE
-                    img_rect.y = row_index * TILE_SIZE
-                    self.tile_list.append((img, img_rect))
+                    goal_rect = self.goal_img.get_rect()
+                    goal_rect.x = col_index * TILE_SIZE
+                    goal_rect.y = row_index * TILE_SIZE
+                    self.goal_tile = goal_rect
 
     def draw(self):
         for tile in self.tile_list:
             screen.blit(tile[0], tile[1])
+        if self.goal_tile:
+            screen.blit(self.goal_img, self.goal_tile)
+
 
 world_data = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # grid of map that can be edited
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -150,7 +157,7 @@ world = World(world_data)
 player = Player(500, 8 * TILE_SIZE - 50)
 meteors = []
 
-#main
+#main loop
 running = True
 while running:
     screen.fill((0, 0, 0))
@@ -174,13 +181,10 @@ while running:
             best_time = max(survival_time, best_time)
 
     elapsed_time = (pygame.time.get_ticks() - game_start_time) // 1000
-    if elapsed_time > 0 and elapsed_time % 10 == 0 and last_spawn_time_reduction != elapsed_time:
-        if spawn_time > 1000:
-            spawn_time -= 500
-        last_spawn_time_reduction = elapsed_time
+
 
     if game_over:
-        print("Game Over! Best Time: ", best_time)
+        print("Game Over!") # Maybe a "game over" screen
         break
 
     for event in pygame.event.get():
