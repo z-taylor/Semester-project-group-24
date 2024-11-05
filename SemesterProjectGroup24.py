@@ -232,6 +232,10 @@ class Player:
             dy += self.vel_y
 
             for tile in world.tile_list:
+                if (tile[1].colliderect(self.rect)) and ( ( (self.rect.bottom >= tile[1].top) and (self.rect.bottom - tile[1].top >= 1) ) or ( (self.rect.top <= tile[1].bottom) and (tile[1].bottom - self.rect.top >= 1) ) ):
+                    self.rect.move_ip(0, -1)
+                elif (tile[1].colliderect(self.rect)) and ( ( (self.rect.right >= tile[1].left) and (self.rect.right - tile[1].left >= 1) ) or ( (self.rect.left <= tile[1].right) and (tile[1].right - self.rect.left >= 1) ) ):
+                    self.rect.move_ip(0, -1)
                 if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.rect.width, self.rect.height):
                     dx = 0
                 if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.rect.width, self.rect.height):
