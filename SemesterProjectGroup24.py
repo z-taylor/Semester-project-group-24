@@ -20,9 +20,9 @@ from pygame.locals import *
 #get the resolution of the active display, then get scaling factors
 #to go back to windowed, remove this function, remove all instances of the widthMulti, heightMulti, and scaleFactor variables, and remove "pygame.FULLSCREEN" from line 40
 root = tk.Tk()
-width, height, hrznRes, vertRes = 1000, 1000, 1000, 1000
+width, height, hrznRes, vertRes = root.winfo_screenwidth(), root.winfo_screenheight(), root.winfo_screenwidth(), root.winfo_screenheight()
 root.destroy()
-scaleFactor, widthMulti, heightMulti = (height/1000), (width/1000), (height/1000)
+scaleFactor, widthMulti, heightMulti = (height/1000), (width/1000), (height/850)
 
 TILE_SIZE = 50
 JUMP_HEIGHT = int(20*scaleFactor)
