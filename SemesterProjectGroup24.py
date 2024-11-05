@@ -18,10 +18,11 @@ import pygame, random, sys, tkinter as tk
 from pygame.locals import *
 
 #get the resolution of the active display, then get scaling factors
+#to go back to windowed, remove this function, remove all instances of the widthMulti, heightMulti, and scaleFactor variables, and remove "pygame.FULLSCREEN" from line 40
 root = tk.Tk()
-width, height = root.winfo_screenwidth(), root.winfo_screenheight()
+width, height, hrznRes, vertRes = 1000, 1000, 1000, 1000
 root.destroy()
-scaleFactor, widthMulti, heightMulti = (height/1000), (width/1000), (height/850)
+scaleFactor, widthMulti, heightMulti = (height/1000), (width/1000), (height/1000)
 
 TILE_SIZE = 50
 JUMP_HEIGHT = int(20*scaleFactor)
@@ -47,135 +48,127 @@ best_time = 0
 last_spawn_time_reduction = 0
 game_over = False
 
-def drawMenu(actionCount):
+def drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust):
     mouse = pygame.mouse.get_pos()
     mouseButtons = pygame.mouse.get_pressed()
-    if  actionCount > 0 and not mouseButtons[0]:
+    if not mouseButtons[0]:
         actionCount = 0 #action count will prevent buttons from being pressed repeatedly while the mouse button is held down, since the menu function is called 60 times/second
+        menuTicker = 0
+    if mouseButtons[0]:
+        menuTicker+=1
     menuSurf = pygame.Surface((width, height), pygame.SRCALPHA)
     menuSurf.fill((0, 0, 0, 128))
     menuBaseRect = pygame.Rect(int(width/4), int(height/4), int(width/2), int(height/2)) #each menu item height will be height/24
     pygame.draw.rect(menuSurf, (255, 255, 255, 255), menuBaseRect)
+    
     itemWidth = menuBaseRect.width
     smallItemWidth = int(menuBaseRect.width/20)
-    itemHeight = int(menuBaseRect.height / 12)
-    doubleItemHeight = int(menuBaseRect.height / 6)
-    menuTitleRect =          pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 0), itemWidth, doubleItemHeight)
-    mouseSensitivityRect =   pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 2), (smallItemWidth * 18), itemHeight)
-    mouseSensitivityUpRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 18), menuBaseRect.top + (itemHeight * 2), smallItemWidth, itemHeight)
-    mouseSensitivityDnRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 19), menuBaseRect.top + (itemHeight * 2), smallItemWidth, itemHeight)
-    fovMultiRect =           pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 3), (smallItemWidth * 18), itemHeight)
-    fovMultiUpRect =         pygame.Rect(menuBaseRect.left + (smallItemWidth * 18), menuBaseRect.top + (itemHeight * 3), smallItemWidth, itemHeight)
-    fovMultiDnRect =         pygame.Rect(menuBaseRect.left + (smallItemWidth * 19), menuBaseRect.top + (itemHeight * 3), smallItemWidth, itemHeight)
-    resMultiRect =           pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 4), (smallItemWidth * 18), itemHeight)
-    resMultiUpRect =         pygame.Rect(menuBaseRect.left + (smallItemWidth * 18), menuBaseRect.top + (itemHeight * 4), smallItemWidth, itemHeight)
-    resMultiDnRect =         pygame.Rect(menuBaseRect.left + (smallItemWidth * 19), menuBaseRect.top + (itemHeight * 4), smallItemWidth, itemHeight)
-    distanceMultiRect =      pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 5), (smallItemWidth * 18), itemHeight)
-    distanceMultiUpRect =    pygame.Rect(menuBaseRect.left + (smallItemWidth * 18), menuBaseRect.top + (itemHeight * 5), smallItemWidth, itemHeight)
-    distanceMultiDnRect =    pygame.Rect(menuBaseRect.left + (smallItemWidth * 19), menuBaseRect.top + (itemHeight * 5), smallItemWidth, itemHeight)
-    devModeRect =            pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 6), itemWidth, itemHeight)
-    render3dRect =           pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 7), itemWidth, itemHeight)
-    showFPSRect =            pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 8), itemWidth, itemHeight)
-    exitRect =               pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 11), itemWidth, itemHeight)
+    itemHeight = int(menuBaseRect.height / 10)
+    doubleItemHeight = int(menuBaseRect.height / 5)
     
-    #menu title
-    pygame.draw.rect(menuSurf, (100, 100, 100, 255), menuTitleRect)
-    menuTitleText = doubleMenuFont.render("Options menu", True, pygame.Color('White'))
-    menuSurf.blit(menuTitleText, (menuTitleRect.x + 2, menuTitleRect.y + 2))
+    menuTitleRect =         pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 0), itemWidth, doubleItemHeight)
+    resolutionRect =        pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 2), itemWidth, itemHeight)
+    hrznResRect =           pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 3), (smallItemWidth * 18), itemHeight)
+    hrznResUpRect =         pygame.Rect(menuBaseRect.left + (smallItemWidth * 18), menuBaseRect.top + (itemHeight * 3), smallItemWidth, itemHeight)
+    hrznResDnRect =         pygame.Rect(menuBaseRect.left + (smallItemWidth * 19), menuBaseRect.top + (itemHeight * 3), smallItemWidth, itemHeight)
+    vertResRect =           pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 4), (smallItemWidth * 18), itemHeight)
+    vertResUpRect =         pygame.Rect(menuBaseRect.left + (smallItemWidth * 18), menuBaseRect.top + (itemHeight * 4), smallItemWidth, itemHeight)
+    vertResDnRect =         pygame.Rect(menuBaseRect.left + (smallItemWidth * 19), menuBaseRect.top + (itemHeight * 4), smallItemWidth, itemHeight)
+    resAdjustRect =         pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 5), itemWidth, itemHeight)
+    helpRect =              pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 6), itemWidth, itemHeight)
+    exitRect =              pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 9), itemWidth, itemHeight)
+    helpTitleRect =         pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 0), (smallItemWidth*19), doubleItemHeight)
+    helpTitleRect_ =        pygame.Rect((menuBaseRect.right - smallItemWidth), menuBaseRect.top + (itemHeight * 1), (smallItemWidth*1), itemHeight)
+    helpTitleXrect =        pygame.Rect((menuBaseRect.right - smallItemWidth), menuBaseRect.top + (itemHeight * 0), (smallItemWidth*1), itemHeight)
     
-    #mouse sensitivity
-    pygame.draw.rect(menuSurf, (100, 100, 100, 255), mouseSensitivityRect)
-    mouseSensitivityText = menuFont.render(f"Mouse sensitivity: {"placeholder text"}", True, pygame.Color('White'))
-    menuSurf.blit(mouseSensitivityText, (mouseSensitivityRect.x + 2, mouseSensitivityRect.y + 2))
-    #mouse sensitivity up
-    pygame.draw.rect(menuSurf, ((150, 150, 150, 255) if mouseSensitivityUpRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)), mouseSensitivityUpRect)
-    mouseSensitivityUpText = menuFont.render("+", True, pygame.Color('White'))
-    menuSurf.blit(mouseSensitivityUpText, (mouseSensitivityUpRect.x + 2, mouseSensitivityUpRect.y + 2))
-    if mouseSensitivityUpRect.collidepoint(mouse) and mouseButtons[0] and actionCount<1:
-        mouseSensitivity += 0.01
-        actionCount+=1
-    #mouse sensitivity down
-    pygame.draw.rect(menuSurf, ((150, 150, 150, 255) if mouseSensitivityDnRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)), mouseSensitivityDnRect)
-    mouseSensitivityDnText = menuFont.render("-", True, pygame.Color('White'))
-    menuSurf.blit(mouseSensitivityDnText, (mouseSensitivityDnRect.x + 2, mouseSensitivityDnRect.y + 2))
-    if mouseSensitivityDnRect.collidepoint(mouse) and mouseButtons[0] and actionCount<1:
-        mouseSensitivity -= 0.01
-        actionCount+=1
+    if not help:
+        #menu title
+        pygame.draw.rect(menuSurf, (100, 100, 100, 255), menuTitleRect)
+        menuTitleText = doubleMenuFont.render("Options menu", True, pygame.Color('White'))
+        menuSurf.blit(menuTitleText, (menuTitleRect.x + 2, menuTitleRect.y + 2))
+        
+        #Screen resolution
+        pygame.draw.rect(menuSurf, (100, 100, 100, 255), resolutionRect)
+        resolutionText = menuFont.render(f"Screen resolution: {width}x{height}", True, pygame.Color('White'))
+        menuSurf.blit(resolutionText, (resolutionRect.x + 2, resolutionRect.y + 2))
+        
 
-    #FOV
-    pygame.draw.rect(menuSurf, (100, 100, 100, 255), fovMultiRect)
-    fovMultiText = menuFont.render(f"FOV: {"placeholder text"}", True, pygame.Color('White'))
-    menuSurf.blit(fovMultiText, (fovMultiRect.x + 2, fovMultiRect.y + 2))
-    #fov up
-    pygame.draw.rect(menuSurf, ((150, 150, 150, 255) if fovMultiUpRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)), fovMultiUpRect)
-    fovMultiUpText = menuFont.render("+", True, pygame.Color('White'))
-    menuSurf.blit(fovMultiUpText, (fovMultiUpRect.x + 2, fovMultiUpRect.y + 2))
-    if fovMultiUpRect.collidepoint(mouse) and mouseButtons[0] and actionCount<1:
-        fovMulti += 0.1
-        actionCount+=1
-    #fov down
-    pygame.draw.rect(menuSurf, ((150, 150, 150, 255) if fovMultiDnRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)), fovMultiDnRect)
-    fovMultiDnText = menuFont.render("-", True, pygame.Color('White'))
-    menuSurf.blit(fovMultiDnText, (fovMultiDnRect.x + 2, fovMultiDnRect.y + 2))
-    if fovMultiDnRect.collidepoint(mouse) and mouseButtons[0] and actionCount<1:
-        fovMulti -= 0.1
-        actionCount+=1
-    
-    #resolution
-    pygame.draw.rect(menuSurf, (100, 100, 100, 255), resMultiRect)
-    resMultiText = menuFont.render(f"Resolution: {"placeholder text"}", True, pygame.Color('White'))
-    menuSurf.blit(resMultiText, (resMultiRect.x + 2, resMultiRect.y + 2))
-    #resolution up
-    pygame.draw.rect(menuSurf, ((150, 150, 150, 255) if resMultiUpRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)), resMultiUpRect)
-    resMultiUpText = menuFont.render("+", True, pygame.Color('White'))
-    menuSurf.blit(resMultiUpText, (resMultiUpRect.x + 2, resMultiUpRect.y + 2))
-    if resMultiUpRect.collidepoint(mouse) and mouseButtons[0] and actionCount<1:
-        resMulti += 0.1
-        actionCount+=1
-    #resolution down
-    pygame.draw.rect(menuSurf, ((150, 150, 150, 255) if resMultiDnRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)), resMultiDnRect)
-    resMultiDnText = menuFont.render("-", True, pygame.Color('White'))
-    menuSurf.blit(resMultiDnText, (resMultiDnRect.x + 2, resMultiDnRect.y + 2))
-    if resMultiDnRect.collidepoint(mouse) and mouseButtons[0] and actionCount<1:
-        resMulti -= 0.1
-        actionCount+=1
-
-    #distance
-    pygame.draw.rect(menuSurf, (100, 100, 100, 255), distanceMultiRect)
-    distanceMultiText = menuFont.render(f"Rendering distance: {"placeholder text"}", True, pygame.Color('White'))
-    menuSurf.blit(distanceMultiText, (distanceMultiRect.x + 2, distanceMultiRect.y + 2))
-    #distance up
-    pygame.draw.rect(menuSurf, ((150, 150, 150, 255) if distanceMultiUpRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)), distanceMultiUpRect)
-    distanceMultiUpText = menuFont.render("+", True, pygame.Color('White'))
-    menuSurf.blit(distanceMultiUpText, (distanceMultiUpRect.x + 2, distanceMultiUpRect.y + 2))
-    if distanceMultiUpRect.collidepoint(mouse) and mouseButtons[0] and actionCount<1:
-        distanceMulti += 0.1
-        actionCount+=1
-    #distance down
-    pygame.draw.rect(menuSurf, ((150, 150, 150, 255) if distanceMultiDnRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)), distanceMultiDnRect)
-    distanceMultiDnText = menuFont.render("-", True, pygame.Color('White'))
-    menuSurf.blit(distanceMultiDnText, (distanceMultiDnRect.x + 2, distanceMultiDnRect.y + 2))
-    if distanceMultiDnRect.collidepoint(mouse) and mouseButtons[0] and actionCount<1:
-        distanceMulti -= 0.1
-        actionCount+=1
-
-    #dev mode
-    pygame.draw.rect(menuSurf, ((150, 150, 150, 255) if devModeRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)), devModeRect)
-    devModeText = menuFont.render(f"Dev mode: {"placeholder text"}", True, pygame.Color('White'))
-    menuSurf.blit(devModeText, (devModeRect.x + 2, devModeRect.y + 2))
-    if devModeRect.collidepoint(mouse) and mouseButtons[0] and actionCount<1:
-            devMode = True if devMode == False else False
+        #Horizontal resolution
+        pygame.draw.rect(menuSurf, (100, 100, 100, 255), hrznResRect)
+        hrznResText = menuFont.render(f"Horizontal resolution: {hrznRes}", True, pygame.Color('White'))
+        menuSurf.blit(hrznResText, (hrznResRect.x + 2, hrznResRect.y + 2))
+        #Horizontal resolution up
+        pygame.draw.rect(menuSurf, ((150, 150, 150, 255) if hrznResUpRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)), hrznResUpRect)
+        hrznResUpText = menuFont.render("+", True, pygame.Color('White'))
+        menuSurf.blit(hrznResUpText, (hrznResUpRect.x + 2, hrznResUpRect.y + 2))
+        if hrznResUpRect.collidepoint(mouse) and mouseButtons[0] and (actionCount<1 or menuTicker>60):
+            hrznRes += 1
             actionCount+=1
-    
-    pygame.draw.rect(menuSurf, ((150, 150, 150, 255) if exitRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)), exitRect)
-    exitText = menuFont.render("Save and exit", True, pygame.Color('White'))
-    menuSurf.blit(exitText, (exitRect.x + 2, exitRect.y + 2))
-    if exitRect.collidepoint(mouse) and mouseButtons[0] and actionCount<1:
-        pygame.event.post(pygame.event.Event(pygame.QUIT))
-        actionCount+=1
-    
+        #Horizontal resolution down
+        pygame.draw.rect(menuSurf, ((150, 150, 150, 255) if hrznResDnRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)), hrznResDnRect)
+        hrznResDnText = menuFont.render("-", True, pygame.Color('White'))
+        menuSurf.blit(hrznResDnText, (hrznResDnRect.x + 2, hrznResDnRect.y + 2))
+        if hrznResDnRect.collidepoint(mouse) and mouseButtons[0] and (actionCount<1 or menuTicker>60):
+            hrznRes -= 1
+            actionCount+=1
+        
+        #Vertical resolution
+        pygame.draw.rect(menuSurf, (100, 100, 100, 255), vertResRect)
+        vertResText = menuFont.render(f"Vertical resolution: {vertRes}", True, pygame.Color('White'))
+        menuSurf.blit(vertResText, (vertResRect.x + 2, vertResRect.y + 2))
+        #Vertical resolution up
+        pygame.draw.rect(menuSurf, ((150, 150, 150, 255) if vertResUpRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)), vertResUpRect)
+        vertResUpText = menuFont.render("+", True, pygame.Color('White'))
+        menuSurf.blit(vertResUpText, (vertResUpRect.x + 2, vertResUpRect.y + 2))
+        if vertResUpRect.collidepoint(mouse) and mouseButtons[0] and (actionCount<1 or menuTicker>60):
+            vertRes += 1
+            actionCount+=1
+        #Vertical resolution down
+        pygame.draw.rect(menuSurf, ((150, 150, 150, 255) if vertResDnRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)), vertResDnRect)
+        vertResDnText = menuFont.render("-", True, pygame.Color('White'))
+        menuSurf.blit(vertResDnText, (vertResDnRect.x + 2, vertResDnRect.y + 2))
+        if vertResDnRect.collidepoint(mouse) and mouseButtons[0] and (actionCount<1 or menuTicker>60):
+            vertRes -= 1
+            actionCount+=1
+
+        #Adjust resolution
+        pygame.draw.rect(menuSurf, ((150, 150, 150, 255) if resAdjustRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)), resAdjustRect)
+        resAdjustText = menuFont.render("Adjust scaling", True, pygame.Color('White'))
+        menuSurf.blit(resAdjustText, (resAdjustRect.x + 2, resAdjustRect.y + 2))
+        if resAdjustRect.collidepoint(mouse) and mouseButtons[0] and (actionCount<1 or menuTicker>60):
+            resAdjust = True
+            actionCount+=1
+
+        #Help
+        pygame.draw.rect(menuSurf, ((150, 150, 150, 255) if helpRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)), helpRect)
+        helpText = menuFont.render(f"Help", True, pygame.Color('White'))
+        menuSurf.blit(helpText, (helpRect.x + 2, helpRect.y + 2))
+        if helpRect.collidepoint(mouse) and mouseButtons[0] and (actionCount<1 or menuTicker>60):
+            help = True
+            actionCount+=1
+        
+        #Exit
+        pygame.draw.rect(menuSurf, ((150, 150, 150, 255) if exitRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)), exitRect)
+        exitText = menuFont.render("Quit game", True, pygame.Color('White'))
+        menuSurf.blit(exitText, (exitRect.x + 2, exitRect.y + 2))
+        if exitRect.collidepoint(mouse) and mouseButtons[0] and (actionCount<1 or menuTicker>60):
+            pygame.event.post(pygame.event.Event(pygame.QUIT))
+            actionCount+=1
+    else:
+        #help menu title
+        pygame.draw.rect(menuSurf, (100, 100, 100, 255), helpTitleRect)
+        pygame.draw.rect(menuSurf, (100, 100, 100, 255), helpTitleRect_)
+        helpTitleText = doubleMenuFont.render("Help menu", True, pygame.Color('White'))
+        menuSurf.blit(helpTitleText, (helpTitleRect.x + 2, helpTitleRect.y + 2))
+        pygame.draw.rect(menuSurf, ((150, 150, 150, 255) if helpTitleXrect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)), helpTitleXrect)
+        helpTitleXtext = menuFont.render("X", True, pygame.Color('White'))
+        text_width, text_height = helpTitleXtext.get_size()
+        menuSurf.blit(helpTitleXtext, ((helpTitleXrect.left + (helpTitleXrect.width - text_width) / 2), (helpTitleXrect.top + (helpTitleXrect.height - text_height) / 2)))
+        if helpTitleXrect.collidepoint(mouse) and mouseButtons[0] and (actionCount<1 or menuTicker>60):
+            help = False
+            actionCount+=1
     screen.blit(menuSurf, (0,0))
-    return actionCount
+    return actionCount, help, menuTicker, hrznRes, vertRes, resAdjust
 
 class SpacePebble:
     def __init__(self):
@@ -310,11 +303,15 @@ world_data = [
 world = World(world_data)
 player = Player(500, 8 * (TILE_SIZE*scaleFactor) - 50)
 meteors = []
-actionCount = 0 #used to stop menu buttons from being spammed while mouse button is held down
+actionCount = 0 #used to stop menu buttons from being spammed while mouse button is initially pressed
+menuTicker = 0 #used to let buttons be held down to repeat the action while stopping main variables from being updated
+help = False
 
 #main loop
 running = True
 menu = False
+resAdjust = False
+escPress = 0
 pygame.mouse.set_visible(False)
 while running:
     screen.fill((0, 0, 0))
@@ -322,16 +319,17 @@ while running:
     world.draw()
 
     keys = pygame.key.get_pressed()
+    if keys[pygame.K_ESCAPE]:
+        escPress += 1
+    elif not keys[pygame.K_ESCAPE] and escPress > 0:
+        escPress = 0
+        menu = not menu
+        pygame.mouse.set_visible(menu)
+
     player.move(keys, world)
     player.draw(screen)
 
-    for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                menu = not menu
-                pygame.mouse.set_visible(menu)
-
-    if pygame.time.get_ticks() - meteor_timer > spawn_time:
+    if (pygame.time.get_ticks() - meteor_timer > spawn_time) and not menu:
         meteors.append(SpacePebble())
         meteor_timer = pygame.time.get_ticks()
 
@@ -351,7 +349,14 @@ while running:
         break
 
     if menu:
-        drawMenu(actionCount)
+        actionCount, help, menuTicker, hrznRes, vertRes, resAdjust = drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust)
+
+    if (width!=hrznRes or height!=vertRes) and resAdjust == True:
+        width, height = hrznRes, vertRes
+        scaleFactor, widthMulti, heightMulti = (height/1000), (width/1000), (height/850)
+        JUMP_HEIGHT, Y_GRAVITY, X_SPEED, meteor_min_size, meteor_max_size = int(20*scaleFactor), int(1*scaleFactor), int(5*scaleFactor), int(20*scaleFactor), int(50*scaleFactor)
+        world = World(world_data)
+        resAdjust = False
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
