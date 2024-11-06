@@ -26,7 +26,7 @@ scaleFactor, widthMulti, heightMulti = (height/1000), (width/1000), (height/850)
 
 TILE_SIZE = 50
 JUMP_HEIGHT = int(20*scaleFactor)
-Y_GRAVITY = int(1*scaleFactor)
+Y_GRAVITY = 1
 X_SPEED = int(5*scaleFactor)
 meteor_min_size = int(20*scaleFactor)
 meteor_max_size = int(50*scaleFactor)
