@@ -1,12 +1,5 @@
 # HARD REQUIREMENTS
 # Must use at least 10 different Surface objects.
-# It must access at least 5 different files, for either reading or writing.
-# It must play at least 2 different sounds.
-#    If these sounds come from files on disk, they also towards the requirement above
-# It must either take inputs from the keyboard, mouse, or a controller.
-# It must feature some sort of movement (i.e.: surfaces moving across other surfaces)
-# The user must be able to quit the game without pressing the X button at the top right or stopping the project running the game.
-# There must be a way for the game to “end”.
 # If the game is some sort of puzzle, the puzzle must be solvable, and the game must acknowledge that the puzzle has been solved.
 # If the game has win and lose conditions, those must be implemented.
 # Either of the above must either close the game or allow the user to restart it
@@ -26,6 +19,7 @@ widthMulti, heightMulti = (width / 1000), (height / 850)
 
 pygame.mixer.init()
 coin_sound = pygame.mixer.Sound('coin1.mp3')
+jump_sound = pygame.mixer.Sound('jump.mp3')
 
 TILE_SIZE = 50
 JUMP_HEIGHT = int(20 * heightMulti)
@@ -48,6 +42,7 @@ pygame.display.set_caption('Platform Game')
 screen = pygame.display.set_mode((width, height), pygame.FULLSCREEN)
 menuFont = pygame.font.Font(None, int((height / 18) - 4))
 doubleMenuFont = pygame.font.Font(None, int((height / 9) - 4))
+gameOverFont = pygame.font.Font(None, int((height / 6) - 4))
 
 meteor_timer = pygame.time.get_ticks()
 game_start_time = pygame.time.get_ticks()
@@ -56,6 +51,50 @@ best_time = 0
 last_spawn_time_reduction = 0
 game_over = False
 
+def drawGameOver(reset, quit):
+    gameOverSurf = pygame.Surface((width, height))
+    gameOverBackground = pygame.image.load("background.png")
+    gameOverBackground = pygame.transform.scale(gameOverBackground, (width, height))
+    gameOverSurf.blit(gameOverBackground, (0, 0))
+    smallHeight = height/6
+    mouse = pygame.mouse.get_pos()
+
+    gameOverTitleText = gameOverFont.render("Game over!", True, pygame.Color('White'))
+    gameOverScoreText = gameOverFont.render(f"Your score: {score}", True, pygame.Color('White'))
+    gameOverResetText = gameOverFont.render("Try again?", True, pygame.Color('White'))
+    gameOverQuitText = gameOverFont.render("Quit?", True, pygame.Color('White'))
+
+    gameOverTitleSurf = pygame.Surface((gameOverTitleText.get_width(), smallHeight), pygame.SRCALPHA)
+    gameOverScoreSurf = pygame.Surface((gameOverScoreText.get_width(), smallHeight), pygame.SRCALPHA)
+    gameOverResetSurf = pygame.Surface((gameOverResetText.get_width(), smallHeight), pygame.SRCALPHA)
+    gameOverQuitSurf = pygame.Surface((gameOverQuitText.get_width(), smallHeight), pygame.SRCALPHA)
+    collisionRect1 = pygame.Rect((width/2 - gameOverResetText.get_width()/2), smallHeight*3, gameOverResetText.get_width(), smallHeight)
+    collisionRect2 = pygame.Rect((width/2 - gameOverQuitText.get_width()/2), smallHeight*4, gameOverQuitText.get_width(), smallHeight)
+
+    gameOverTitleSurf.fill((0, 0, 0, 0))
+    gameOverScoreSurf.fill((0, 0, 0, 0))
+    gameOverResetSurf.fill((0, 0, 0, 128) if collisionRect1.collidepoint(mouse) else (0, 0, 0, 0))
+    gameOverQuitSurf.fill((0, 0, 0, 128) if collisionRect2.collidepoint(mouse) else (0, 0, 0, 0))
+
+    gameOverTitleSurf.blit(gameOverTitleText, (0, 0))
+    gameOverScoreSurf.blit(gameOverScoreText, (0, 0))
+    gameOverResetSurf.blit(gameOverResetText, (0, 0))
+    gameOverQuitSurf.blit(gameOverQuitText, (0, 0))
+
+    gameOverSurf.blit(gameOverTitleSurf, ((width/2 - gameOverTitleText.get_width()/2), smallHeight*1))
+    gameOverSurf.blit(gameOverScoreSurf, ((width/2 - gameOverScoreText.get_width()/2), smallHeight*2))
+    gameOverSurf.blit(gameOverResetSurf, ((width/2 - gameOverResetText.get_width()/2), smallHeight*3))
+    gameOverSurf.blit(gameOverQuitSurf, ((width/2 - gameOverQuitText.get_width()/2), smallHeight*4))
+    
+    screen.blit(gameOverSurf, (0, 0))
+
+    mouseButtons = pygame.mouse.get_pressed()
+    if collisionRect1.collidepoint(mouse) and mouseButtons[0]:
+        reset = True
+    elif collisionRect2.collidepoint(mouse) and mouseButtons[0]:
+        quit = True
+    
+    return reset, quit
 
 def drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust):
     mouse = pygame.mouse.get_pos()
@@ -79,24 +118,17 @@ def drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust):
     menuTitleRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 0), itemWidth, doubleItemHeight)
     resolutionRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 2), itemWidth, itemHeight)
     hrznResRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 3), (smallItemWidth * 18), itemHeight)
-    hrznResUpRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 18), menuBaseRect.top + (itemHeight * 3),
-                                smallItemWidth, itemHeight)
-    hrznResDnRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 19), menuBaseRect.top + (itemHeight * 3),
-                                smallItemWidth, itemHeight)
+    hrznResUpRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 18), menuBaseRect.top + (itemHeight * 3),smallItemWidth, itemHeight)
+    hrznResDnRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 19), menuBaseRect.top + (itemHeight * 3),smallItemWidth, itemHeight)
     vertResRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 4), (smallItemWidth * 18), itemHeight)
-    vertResUpRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 18), menuBaseRect.top + (itemHeight * 4),
-                                smallItemWidth, itemHeight)
-    vertResDnRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 19), menuBaseRect.top + (itemHeight * 4),
-                                smallItemWidth, itemHeight)
+    vertResUpRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 18), menuBaseRect.top + (itemHeight * 4),smallItemWidth, itemHeight)
+    vertResDnRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 19), menuBaseRect.top + (itemHeight * 4),smallItemWidth, itemHeight)
     resAdjustRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 5), itemWidth, itemHeight)
     helpRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 6), itemWidth, itemHeight)
     exitRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 9), itemWidth, itemHeight)
-    helpTitleRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 0), (smallItemWidth * 19),
-                                doubleItemHeight)
-    helpTitleRect_ = pygame.Rect((menuBaseRect.right - smallItemWidth), menuBaseRect.top + (itemHeight * 1),
-                                 (smallItemWidth * 1), itemHeight)
-    helpTitleXrect = pygame.Rect((menuBaseRect.right - smallItemWidth), menuBaseRect.top + (itemHeight * 0),
-                                 (smallItemWidth * 1), itemHeight)
+    helpTitleRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 0), (smallItemWidth * 19),doubleItemHeight)
+    helpTitleRect_ = pygame.Rect((menuBaseRect.right - smallItemWidth), menuBaseRect.top + (itemHeight * 1),(smallItemWidth * 1), itemHeight)
+    helpTitleXrect = pygame.Rect((menuBaseRect.right - smallItemWidth), menuBaseRect.top + (itemHeight * 0),(smallItemWidth * 1), itemHeight)
 
     if not help:
         # menu title
@@ -272,6 +304,7 @@ class Player:
             if keys[pygame.K_SPACE] and not self.jumping:
                 self.vel_y = -JUMP_HEIGHT
                 self.jumping = True
+                jump_sound.play()
             
             self.vel_y += Y_GRAVITY
             dy += self.vel_y
@@ -364,11 +397,14 @@ menu = False
 resAdjust = False
 escPress = 0
 ticker = 0
+reset = False
+quit = False
 pygame.mouse.set_visible(False)
 while running:
     screen.fill((0, 0, 0))
 
-    world.draw()
+    if not game_over:
+        world.draw()
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_ESCAPE]:
@@ -378,27 +414,26 @@ while running:
         menu = not menu
         pygame.mouse.set_visible(menu)
 
-    player.move(keys, world)
-    player.draw(screen)
+    if not menu:
+        player.move(keys, world)
+        if not game_over:
+            player.draw(screen)
 
-    if (pygame.time.get_ticks() - meteor_timer > spawn_time) and not menu:
+    if (pygame.time.get_ticks() - meteor_timer > spawn_time) and not (menu or game_over):
         if score > 1 or ticker > 300:
             meteors.append(SpacePebble())
         meteor_timer = pygame.time.get_ticks()
 
-    for meteor in meteors[:]:
-        meteor.move()
-        meteor.draw()
+    if not game_over:
+        for meteor in meteors[:]:
+            meteor.move()
+            meteor.draw()
 
-        if meteor.rect.colliderect(player.rect):
-            game_over = True
-            best_time = max(survival_time, best_time)
+            if meteor.rect.colliderect(player.rect):
+                game_over = True
+                best_time = max(survival_time, best_time)
 
     elapsed_time = (pygame.time.get_ticks() - game_start_time) // 1000
-
-    if game_over:
-        print("Game Over!")  # Maybe a "game over" screen
-        break
 
     for coin in coins[:]:   #COINCOIN
         coin.draw(screen)
@@ -427,8 +462,21 @@ while running:
     score_text = menuFont.render(f"Score: {score}", True, pygame.Color('White'))  ##COINCOIN
     screen.blit(score_text, (10, 10))
 
-    pygame.display.flip()
     ticker += 1
     clock.tick(60)
+    pygame.mouse.set_visible(game_over)
+    if game_over:
+        coins.clear()
+        meteors.clear()
+        reset, quit = drawGameOver(reset, quit)
+    pygame.display.flip()
+    if quit:
+        break
+    if reset:
+        game_over = not game_over
+        reset = not reset
+        score = 0
+        coins = [Coin(100*widthMulti, 500*heightMulti), Coin(300*widthMulti, 400*heightMulti), Coin(500*widthMulti, 300*heightMulti)]
+        
 
 pygame.quit()
