@@ -382,7 +382,7 @@ while running:
     player.draw(screen)
 
     if (pygame.time.get_ticks() - meteor_timer > spawn_time) and not menu:
-        if ticker > 300:
+        if score > 1 or ticker > 300:
             meteors.append(SpacePebble())
         meteor_timer = pygame.time.get_ticks()
 
