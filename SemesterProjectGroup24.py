@@ -252,8 +252,8 @@ class Player:
     def __init__(self, x, y):
         self.image = pygame.image.load('Human.png').convert_alpha()
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.x = x*widthMulti
+        self.rect.y = y*heightMulti
         self.vel_y = 0
         self.jumping = False
 
@@ -291,11 +291,11 @@ class Player:
                     elif self.vel_y < 0:
                         dy = tile[1].bottom - self.rect.top
                         self.vel_y = 0
-            playerX, playerY = self.rect.x, self.rect.y
             new_rect = self.rect.move(dx, dy)
             if 0 <= new_rect.x <= width-self.rect.width and 0 <= new_rect.y <= height-self.rect.height:
                 self.rect.x += dx
             self.rect.y += dy
+            #print(self.rect.x, self.rect.y)
 
         if world.goal_tile and world.goal_tile.colliderect(self.rect):
             print("You win")  # Maybe have a "you win" screen
@@ -352,7 +352,7 @@ world_data = [
 ]
 
 world = World(world_data)
-player = Player(500, 8 * (TILE_SIZE * heightMulti) - 50)
+player = Player(3.125, 770.3125)
 meteors = []
 actionCount = 0  # used to stop menu buttons from being spammed while mouse button is initially pressed
 menuTicker = 0  # used to let buttons be held down to repeat the action while stopping main variables from being updated
@@ -363,6 +363,7 @@ running = True
 menu = False
 resAdjust = False
 escPress = 0
+ticker = 0
 pygame.mouse.set_visible(False)
 while running:
     screen.fill((0, 0, 0))
@@ -381,7 +382,8 @@ while running:
     player.draw(screen)
 
     if (pygame.time.get_ticks() - meteor_timer > spawn_time) and not menu:
-        meteors.append(SpacePebble())
+        if ticker > 300:
+            meteors.append(SpacePebble())
         meteor_timer = pygame.time.get_ticks()
 
     for meteor in meteors[:]:
@@ -426,6 +428,7 @@ while running:
     screen.blit(score_text, (10, 10))
 
     pygame.display.flip()
+    ticker += 1
     clock.tick(60)
 
 pygame.quit()
