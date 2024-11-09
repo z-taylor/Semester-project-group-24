@@ -32,7 +32,7 @@ spawn_time = meteor_initial_spawn_time
 clock = pygame.time.Clock()
 
 background = pygame.image.load('background.png')
-scaled_background = pygame.transform.scale(background,(1920,1080))
+scaled_background = pygame.transform.scale(background,(width, height))
 
 
 def draw(self, screen):
@@ -66,7 +66,7 @@ def drawGameOver(reset, quit):
     mouse = pygame.mouse.get_pos()
 
     gameOverTitleText = gameOverFont.render("Game over!", True, pygame.Color('White'))
-    gameOverScoreText = gameOverFont.render(f"Your score: {score}", True, pygame.Color('White'))
+    gameOverScoreText = gameOverFont.render(f"You collected {score}/5 coins", True, pygame.Color('White'))
     gameOverResetText = gameOverFont.render("Try again?", True, pygame.Color('White'))
     gameOverQuitText = gameOverFont.render("Quit?", True, pygame.Color('White'))
 
@@ -492,7 +492,7 @@ while running:
     score_text = menuFont.render(f"Coins: {score}/5", True, pygame.Color('White'))  ##COINCOIN
     screen.blit(score_text, (10, 10))
     objective_text = menuFont.render(f"Collect all 5 coins and reach the flag.", True, pygame.Color('White'))
-    screen.blit(objective_text, (620, 10))
+    screen.blit(objective_text, ((width/2) - (objective_text.get_width()/2), 10))
 
     ticker += 1
     clock.tick(60)
