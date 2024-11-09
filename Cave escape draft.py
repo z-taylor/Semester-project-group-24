@@ -265,7 +265,7 @@ class Coin:
 
 
 coins = [Coin(100 * widthMulti, 500 * heightMulti), Coin(300 * widthMulti, 400 * heightMulti),
-         Coin(500 * widthMulti, 300 * heightMulti)]
+         Coin(500 * widthMulti, 300 * heightMulti), Coin(800 * widthMulti, 700 * heightMulti), Coin(540 * widthMulti, 140*heightMulti)]
 
 
 class SpacePebble:
@@ -510,6 +510,7 @@ while running:
         score = 0
         player = Player(3.125, 770.3125)
         coins = [Coin(100 * widthMulti, 500 * heightMulti), Coin(300 * widthMulti, 400 * heightMulti),
-                 Coin(500 * widthMulti, 300 * heightMulti)]
+                 Coin(500 * widthMulti, 300 * heightMulti), Coin(800 * widthMulti, 700 * heightMulti),
+                 Coin(540 * widthMulti, 140 * heightMulti)]
 
 pygame.quit()
