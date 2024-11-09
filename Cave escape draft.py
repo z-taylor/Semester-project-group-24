@@ -31,8 +31,13 @@ meteor_initial_spawn_time = 500
 spawn_time = meteor_initial_spawn_time
 clock = pygame.time.Clock()
 
+background = pygame.image.load('background.png')
+scaled_background = pygame.transform.scale(background,(1920,1080))
+
+
 def draw(self, screen):
     screen.blit(self.image, self.rect)
+
 
 score = 0
 
@@ -51,12 +56,13 @@ best_time = 0
 last_spawn_time_reduction = 0
 game_over = False
 
+
 def drawGameOver(reset, quit):
     gameOverSurf = pygame.Surface((width, height))
     gameOverBackground = pygame.image.load("background.png")
     gameOverBackground = pygame.transform.scale(gameOverBackground, (width, height))
     gameOverSurf.blit(gameOverBackground, (0, 0))
-    smallHeight = height/6
+    smallHeight = height / 6
     mouse = pygame.mouse.get_pos()
 
     gameOverTitleText = gameOverFont.render("Game over!", True, pygame.Color('White'))
@@ -68,8 +74,10 @@ def drawGameOver(reset, quit):
     gameOverScoreSurf = pygame.Surface((gameOverScoreText.get_width(), smallHeight), pygame.SRCALPHA)
     gameOverResetSurf = pygame.Surface((gameOverResetText.get_width(), smallHeight), pygame.SRCALPHA)
     gameOverQuitSurf = pygame.Surface((gameOverQuitText.get_width(), smallHeight), pygame.SRCALPHA)
-    collisionRect1 = pygame.Rect((width/2 - gameOverResetText.get_width()/2), smallHeight*3, gameOverResetText.get_width(), smallHeight)
-    collisionRect2 = pygame.Rect((width/2 - gameOverQuitText.get_width()/2), smallHeight*4, gameOverQuitText.get_width(), smallHeight)
+    collisionRect1 = pygame.Rect((width / 2 - gameOverResetText.get_width() / 2), smallHeight * 3,
+                                 gameOverResetText.get_width(), smallHeight)
+    collisionRect2 = pygame.Rect((width / 2 - gameOverQuitText.get_width() / 2), smallHeight * 4,
+                                 gameOverQuitText.get_width(), smallHeight)
 
     gameOverTitleSurf.fill((0, 0, 0, 0))
     gameOverScoreSurf.fill((0, 0, 0, 0))
@@ -81,11 +89,11 @@ def drawGameOver(reset, quit):
     gameOverResetSurf.blit(gameOverResetText, (0, 0))
     gameOverQuitSurf.blit(gameOverQuitText, (0, 0))
 
-    gameOverSurf.blit(gameOverTitleSurf, ((width/2 - gameOverTitleText.get_width()/2), smallHeight*1))
-    gameOverSurf.blit(gameOverScoreSurf, ((width/2 - gameOverScoreText.get_width()/2), smallHeight*2))
-    gameOverSurf.blit(gameOverResetSurf, ((width/2 - gameOverResetText.get_width()/2), smallHeight*3))
-    gameOverSurf.blit(gameOverQuitSurf, ((width/2 - gameOverQuitText.get_width()/2), smallHeight*4))
-    
+    gameOverSurf.blit(gameOverTitleSurf, ((width / 2 - gameOverTitleText.get_width() / 2), smallHeight * 1))
+    gameOverSurf.blit(gameOverScoreSurf, ((width / 2 - gameOverScoreText.get_width() / 2), smallHeight * 2))
+    gameOverSurf.blit(gameOverResetSurf, ((width / 2 - gameOverResetText.get_width() / 2), smallHeight * 3))
+    gameOverSurf.blit(gameOverQuitSurf, ((width / 2 - gameOverQuitText.get_width() / 2), smallHeight * 4))
+
     screen.blit(gameOverSurf, (0, 0))
 
     mouseButtons = pygame.mouse.get_pressed()
@@ -93,8 +101,9 @@ def drawGameOver(reset, quit):
         reset = True
     elif collisionRect2.collidepoint(mouse) and mouseButtons[0]:
         quit = True
-    
+
     return reset, quit
+
 
 def drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust):
     mouse = pygame.mouse.get_pos()
@@ -118,17 +127,24 @@ def drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust):
     menuTitleRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 0), itemWidth, doubleItemHeight)
     resolutionRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 2), itemWidth, itemHeight)
     hrznResRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 3), (smallItemWidth * 18), itemHeight)
-    hrznResUpRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 18), menuBaseRect.top + (itemHeight * 3),smallItemWidth, itemHeight)
-    hrznResDnRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 19), menuBaseRect.top + (itemHeight * 3),smallItemWidth, itemHeight)
+    hrznResUpRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 18), menuBaseRect.top + (itemHeight * 3),
+                                smallItemWidth, itemHeight)
+    hrznResDnRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 19), menuBaseRect.top + (itemHeight * 3),
+                                smallItemWidth, itemHeight)
     vertResRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 4), (smallItemWidth * 18), itemHeight)
-    vertResUpRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 18), menuBaseRect.top + (itemHeight * 4),smallItemWidth, itemHeight)
-    vertResDnRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 19), menuBaseRect.top + (itemHeight * 4),smallItemWidth, itemHeight)
+    vertResUpRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 18), menuBaseRect.top + (itemHeight * 4),
+                                smallItemWidth, itemHeight)
+    vertResDnRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 19), menuBaseRect.top + (itemHeight * 4),
+                                smallItemWidth, itemHeight)
     resAdjustRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 5), itemWidth, itemHeight)
     helpRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 6), itemWidth, itemHeight)
     exitRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 9), itemWidth, itemHeight)
-    helpTitleRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 0), (smallItemWidth * 19),doubleItemHeight)
-    helpTitleRect_ = pygame.Rect((menuBaseRect.right - smallItemWidth), menuBaseRect.top + (itemHeight * 1),(smallItemWidth * 1), itemHeight)
-    helpTitleXrect = pygame.Rect((menuBaseRect.right - smallItemWidth), menuBaseRect.top + (itemHeight * 0),(smallItemWidth * 1), itemHeight)
+    helpTitleRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 0), (smallItemWidth * 19),
+                                doubleItemHeight)
+    helpTitleRect_ = pygame.Rect((menuBaseRect.right - smallItemWidth), menuBaseRect.top + (itemHeight * 1),
+                                 (smallItemWidth * 1), itemHeight)
+    helpTitleXrect = pygame.Rect((menuBaseRect.right - smallItemWidth), menuBaseRect.top + (itemHeight * 0),
+                                 (smallItemWidth * 1), itemHeight)
 
     if not help:
         # menu title
@@ -148,7 +164,7 @@ def drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust):
         # Horizontal resolution up
         pygame.draw.rect(menuSurf, (
             (150, 150, 150, 255) if hrznResUpRect.collidepoint(mouse) and not mouseButtons[0] else (
-            100, 100, 100, 255)), hrznResUpRect)
+                100, 100, 100, 255)), hrznResUpRect)
         hrznResUpText = menuFont.render("+", True, pygame.Color('White'))
         menuSurf.blit(hrznResUpText, (hrznResUpRect.x + 2, hrznResUpRect.y + 2))
         if hrznResUpRect.collidepoint(mouse) and mouseButtons[0] and (actionCount < 1 or menuTicker > 60):
@@ -157,7 +173,7 @@ def drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust):
         # Horizontal resolution down
         pygame.draw.rect(menuSurf, (
             (150, 150, 150, 255) if hrznResDnRect.collidepoint(mouse) and not mouseButtons[0] else (
-            100, 100, 100, 255)), hrznResDnRect)
+                100, 100, 100, 255)), hrznResDnRect)
         hrznResDnText = menuFont.render("-", True, pygame.Color('White'))
         menuSurf.blit(hrznResDnText, (hrznResDnRect.x + 2, hrznResDnRect.y + 2))
         if hrznResDnRect.collidepoint(mouse) and mouseButtons[0] and (actionCount < 1 or menuTicker > 60):
@@ -171,7 +187,7 @@ def drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust):
         # Vertical resolution up
         pygame.draw.rect(menuSurf, (
             (150, 150, 150, 255) if vertResUpRect.collidepoint(mouse) and not mouseButtons[0] else (
-            100, 100, 100, 255)), vertResUpRect)
+                100, 100, 100, 255)), vertResUpRect)
         vertResUpText = menuFont.render("+", True, pygame.Color('White'))
         menuSurf.blit(vertResUpText, (vertResUpRect.x + 2, vertResUpRect.y + 2))
         if vertResUpRect.collidepoint(mouse) and mouseButtons[0] and (actionCount < 1 or menuTicker > 60):
@@ -180,7 +196,7 @@ def drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust):
         # Vertical resolution down
         pygame.draw.rect(menuSurf, (
             (150, 150, 150, 255) if vertResDnRect.collidepoint(mouse) and not mouseButtons[0] else (
-            100, 100, 100, 255)), vertResDnRect)
+                100, 100, 100, 255)), vertResDnRect)
         vertResDnText = menuFont.render("-", True, pygame.Color('White'))
         menuSurf.blit(vertResDnText, (vertResDnRect.x + 2, vertResDnRect.y + 2))
         if vertResDnRect.collidepoint(mouse) and mouseButtons[0] and (actionCount < 1 or menuTicker > 60):
@@ -190,7 +206,7 @@ def drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust):
         # Adjust resolution
         pygame.draw.rect(menuSurf, (
             (150, 150, 150, 255) if resAdjustRect.collidepoint(mouse) and not mouseButtons[0] else (
-            100, 100, 100, 255)), resAdjustRect)
+                100, 100, 100, 255)), resAdjustRect)
         resAdjustText = menuFont.render("Adjust scaling", True, pygame.Color('White'))
         menuSurf.blit(resAdjustText, (resAdjustRect.x + 2, resAdjustRect.y + 2))
         if resAdjustRect.collidepoint(mouse) and mouseButtons[0] and (actionCount < 1 or menuTicker > 60):
@@ -224,7 +240,7 @@ def drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust):
         menuSurf.blit(helpTitleText, (helpTitleRect.x + 2, helpTitleRect.y + 2))
         pygame.draw.rect(menuSurf, (
             (150, 150, 150, 255) if helpTitleXrect.collidepoint(mouse) and not mouseButtons[0] else (
-            100, 100, 100, 255)), helpTitleXrect)
+                100, 100, 100, 255)), helpTitleXrect)
         helpTitleXtext = menuFont.render("X", True, pygame.Color('White'))
         text_width, text_height = helpTitleXtext.get_size()
         menuSurf.blit(helpTitleXtext, ((helpTitleXrect.left + (helpTitleXrect.width - text_width) / 2),
@@ -235,10 +251,11 @@ def drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust):
     screen.blit(menuSurf, (0, 0))
     return actionCount, help, menuTicker, hrznRes, vertRes, resAdjust
 
+
 class Coin:
     def __init__(self, x, y):
         self.image = pygame.image.load('coin.png').convert_alpha()
-        self.image = pygame.transform.scale(self.image, (20,20))
+        self.image = pygame.transform.scale(self.image, (20, 20))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -246,7 +263,10 @@ class Coin:
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
-coins = [Coin(100*widthMulti, 500*heightMulti), Coin(300*widthMulti, 400*heightMulti), Coin(500*widthMulti, 300*heightMulti)]
+
+coins = [Coin(100 * widthMulti, 500 * heightMulti), Coin(300 * widthMulti, 400 * heightMulti),
+         Coin(500 * widthMulti, 300 * heightMulti)]
+
 
 class SpacePebble:
     def __init__(self):
@@ -280,12 +300,13 @@ class SpacePebble:
     def draw(self):
         pygame.draw.rect(screen, (255, 0, 0), self.rect)
 
+
 class Player:
     def __init__(self, x, y):
         self.image = pygame.image.load('Human.png').convert_alpha()
         self.rect = self.image.get_rect()
-        self.rect.x = x*widthMulti
-        self.rect.y = y*heightMulti
+        self.rect.x = x * widthMulti
+        self.rect.y = y * heightMulti
         self.vel_y = 0
         self.jumping = False
 
@@ -305,14 +326,18 @@ class Player:
                 self.vel_y = -JUMP_HEIGHT
                 self.jumping = True
                 jump_sound.play()
-            
+
             self.vel_y += Y_GRAVITY
             dy += self.vel_y
 
             for tile in world.tile_list:
-                if (tile[1].colliderect(self.rect)) and ( ( (self.rect.bottom >= tile[1].top) and (self.rect.bottom - tile[1].top >= 1) ) or ( (self.rect.top <= tile[1].bottom) and (tile[1].bottom - self.rect.top >= 1) ) ):
+                if (tile[1].colliderect(self.rect)) and (
+                        ((self.rect.bottom >= tile[1].top) and (self.rect.bottom - tile[1].top >= 1)) or (
+                        (self.rect.top <= tile[1].bottom) and (tile[1].bottom - self.rect.top >= 1))):
                     self.rect.move_ip(0, -1)
-                elif (tile[1].colliderect(self.rect)) and ( ( (self.rect.right >= tile[1].left) and (self.rect.right - tile[1].left >= 1) ) or ( (self.rect.left <= tile[1].right) and (tile[1].right - self.rect.left >= 1) ) ):
+                elif (tile[1].colliderect(self.rect)) and (
+                        ((self.rect.right >= tile[1].left) and (self.rect.right - tile[1].left >= 1)) or (
+                        (self.rect.left <= tile[1].right) and (tile[1].right - self.rect.left >= 1))):
                     self.rect.move_ip(0, -1)
                 if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.rect.width, self.rect.height):
                     dx = 0
@@ -325,15 +350,16 @@ class Player:
                         dy = tile[1].bottom - self.rect.top
                         self.vel_y = 0
             new_rect = self.rect.move(dx, dy)
-            if 0 <= new_rect.x <= width-self.rect.width and 0 <= new_rect.y <= height-self.rect.height:
+            if 0 <= new_rect.x <= width - self.rect.width and 0 <= new_rect.y <= height - self.rect.height:
                 self.rect.x += dx
             self.rect.y += dy
-            #print(self.rect.x, self.rect.y)
+            # print(self.rect.x, self.rect.y)
 
-        if world.goal_tile and world.goal_tile.colliderect(self.rect):
+        if world.goal_tile and world.goal_tile.colliderect(self.rect) and score==5:
             print("You win")  # Maybe have a "you win" screen
             pygame.quit()
             sys.exit()
+
 
 class World:
     def __init__(self, data):
@@ -342,7 +368,7 @@ class World:
         dirt_img = pygame.image.load('dirt.jpg')
         goal_img = pygame.image.load('goal.png')
         self.goal_img = pygame.transform.scale(goal_img, (
-        TILE_SIZE * widthMulti, TILE_SIZE * heightMulti))  # Scale goal image to tile size
+            TILE_SIZE * widthMulti, TILE_SIZE * heightMulti))  # Scale goal image to tile size
 
         for row_index, row in enumerate(data):
             for col_index, tile in enumerate(row):
@@ -363,6 +389,7 @@ class World:
             screen.blit(tile[0], tile[1])
         if self.goal_tile:
             screen.blit(self.goal_img, self.goal_tile)
+
 
 world_data = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # grid of map that can be edited
@@ -402,6 +429,8 @@ quit = False
 pygame.mouse.set_visible(False)
 while running:
     screen.fill((0, 0, 0))
+    screen.blit(scaled_background, (0, 0))
+
 
     if not game_over:
         world.draw()
@@ -435,7 +464,7 @@ while running:
 
     elapsed_time = (pygame.time.get_ticks() - game_start_time) // 1000
 
-    for coin in coins[:]:   #COINCOIN
+    for coin in coins[:]:  # COINCOIN
         coin.draw(screen)
         if player.rect.colliderect(coin.rect):
             coins.remove(coin)
@@ -444,7 +473,8 @@ while running:
             coin_sound.play()
 
     if menu:
-        actionCount, help, menuTicker, hrznRes, vertRes, resAdjust = drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust)
+        actionCount, help, menuTicker, hrznRes, vertRes, resAdjust = drawMenu(actionCount, help, menuTicker, hrznRes,
+                                                                              vertRes, resAdjust)
 
     if (width != hrznRes or height != vertRes) and resAdjust == True:
         width, height = hrznRes, vertRes
@@ -459,8 +489,10 @@ while running:
             pygame.quit()
             sys.exit()
 
-    score_text = menuFont.render(f"Score: {score}", True, pygame.Color('White'))  ##COINCOIN
+    score_text = menuFont.render(f"Coins: {score}/5", True, pygame.Color('White'))  ##COINCOIN
     screen.blit(score_text, (10, 10))
+    objective_text = menuFont.render(f"Collect all 5 coins and reach the flag.", True, pygame.Color('White'))
+    screen.blit(objective_text, (620, 10))
 
     ticker += 1
     clock.tick(60)
@@ -476,7 +508,8 @@ while running:
         game_over = not game_over
         reset = not reset
         score = 0
-        coins = [Coin(100*widthMulti, 500*heightMulti), Coin(300*widthMulti, 400*heightMulti), Coin(500*widthMulti, 300*heightMulti)]
-        
+        player = Player(3.125, 770.3125)
+        coins = [Coin(100 * widthMulti, 500 * heightMulti), Coin(300 * widthMulti, 400 * heightMulti),
+                 Coin(500 * widthMulti, 300 * heightMulti)]
 
 pygame.quit()
