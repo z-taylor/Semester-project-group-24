@@ -22,23 +22,20 @@ from pygame.locals import *
 root = tk.Tk()
 width, height, hrznRes, vertRes = root.winfo_screenwidth(), root.winfo_screenheight(), root.winfo_screenwidth(), root.winfo_screenheight()
 root.destroy()
-scaleFactor, widthMulti, heightMulti = (height / 1000), (width / 1000), (height / 850)
+widthMulti, heightMulti = (width / 1000), (height / 850)
 
 pygame.mixer.init()
 coin_sound = pygame.mixer.Sound('coin1.mp3')
 
 TILE_SIZE = 50
-JUMP_HEIGHT = int(20 * scaleFactor)
+JUMP_HEIGHT = int(20 * heightMulti)
 Y_GRAVITY = 1
-X_SPEED = int(5 * scaleFactor)
-meteor_min_size = int(20 * scaleFactor)
-meteor_max_size = int(50 * scaleFactor)
+X_SPEED = int(5 * widthMulti)
+meteor_min_size = int(20 * heightMulti)
+meteor_max_size = int(50 * heightMulti)
 meteor_initial_spawn_time = 500
 spawn_time = meteor_initial_spawn_time
 clock = pygame.time.Clock()
-
-
-
 
 def draw(self, screen):
     screen.blit(self.image, self.rect)
@@ -206,7 +203,6 @@ def drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust):
     screen.blit(menuSurf, (0, 0))
     return actionCount, help, menuTicker, hrznRes, vertRes, resAdjust
 
-
 class Coin:
     def __init__(self, x, y):
         self.image = pygame.image.load('coin.png').convert_alpha()
@@ -218,7 +214,7 @@ class Coin:
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
-coins = [Coin(100, 500), Coin(300, 400), Coin(500, 300)]
+coins = [Coin(100*widthMulti, 500*heightMulti), Coin(300*widthMulti, 400*heightMulti), Coin(500*widthMulti, 300*heightMulti)]
 
 class SpacePebble:
     def __init__(self):
@@ -237,7 +233,7 @@ class SpacePebble:
         speed_factor = random.randint(2, 5)
         if self.rect.top <= 0:
             return random.uniform(-2, 2), speed_factor
-        elif self.rect.bottom >= (1000 * scaleFactor):
+        elif self.rect.bottom >= (1000 * heightMulti):
             return random.uniform(-2, 2), -speed_factor
         elif self.rect.left <= 0:
             return speed_factor, random.uniform(-2, 2)
@@ -252,11 +248,9 @@ class SpacePebble:
     def draw(self):
         pygame.draw.rect(screen, (255, 0, 0), self.rect)
 
-
 class Player:
     def __init__(self, x, y):
-        self.image = pygame.Surface((50, 50))
-        self.image.fill((255, 255, 255))
+        self.image = pygame.image.load('Human.png').convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -278,11 +272,15 @@ class Player:
             if keys[pygame.K_SPACE] and not self.jumping:
                 self.vel_y = -JUMP_HEIGHT
                 self.jumping = True
-
+            
             self.vel_y += Y_GRAVITY
             dy += self.vel_y
 
             for tile in world.tile_list:
+                if (tile[1].colliderect(self.rect)) and ( ( (self.rect.bottom >= tile[1].top) and (self.rect.bottom - tile[1].top >= 1) ) or ( (self.rect.top <= tile[1].bottom) and (tile[1].bottom - self.rect.top >= 1) ) ):
+                    self.rect.move_ip(0, -1)
+                elif (tile[1].colliderect(self.rect)) and ( ( (self.rect.right >= tile[1].left) and (self.rect.right - tile[1].left >= 1) ) or ( (self.rect.left <= tile[1].right) and (tile[1].right - self.rect.left >= 1) ) ):
+                    self.rect.move_ip(0, -1)
                 if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.rect.width, self.rect.height):
                     dx = 0
                 if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.rect.width, self.rect.height):
@@ -293,15 +291,16 @@ class Player:
                     elif self.vel_y < 0:
                         dy = tile[1].bottom - self.rect.top
                         self.vel_y = 0
-
-            self.rect.x += dx
+            playerX, playerY = self.rect.x, self.rect.y
+            new_rect = self.rect.move(dx, dy)
+            if 0 <= new_rect.x <= width-self.rect.width and 0 <= new_rect.y <= height-self.rect.height:
+                self.rect.x += dx
             self.rect.y += dy
 
         if world.goal_tile and world.goal_tile.colliderect(self.rect):
             print("You win")  # Maybe have a "you win" screen
             pygame.quit()
             sys.exit()
-
 
 class World:
     def __init__(self, data):
@@ -332,7 +331,6 @@ class World:
         if self.goal_tile:
             screen.blit(self.goal_img, self.goal_tile)
 
-
 world_data = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # grid of map that can be edited
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -354,7 +352,7 @@ world_data = [
 ]
 
 world = World(world_data)
-player = Player(500, 8 * (TILE_SIZE * scaleFactor) - 50)
+player = Player(500, 8 * (TILE_SIZE * heightMulti) - 50)
 meteors = []
 actionCount = 0  # used to stop menu buttons from being spammed while mouse button is initially pressed
 menuTicker = 0  # used to let buttons be held down to repeat the action while stopping main variables from being updated
@@ -400,26 +398,24 @@ while running:
         print("Game Over!")  # Maybe a "game over" screen
         break
 
-    if menu:
-        actionCount, help, menuTicker, hrznRes, vertRes, resAdjust = drawMenu(actionCount, help, menuTicker, hrznRes,
-                                                                              vertRes, resAdjust)
-
-    if (width != hrznRes or height != vertRes) and resAdjust == True:
-        width, height = hrznRes, vertRes
-        scaleFactor, widthMulti, heightMulti = (height / 1000), (width / 1000), (height / 850)
-        JUMP_HEIGHT, Y_GRAVITY, X_SPEED, meteor_min_size, meteor_max_size = int(20 * scaleFactor), int(
-            1 * scaleFactor), int(5 * scaleFactor), int(20 * scaleFactor), int(50 * scaleFactor)
-        world = World(world_data)
-        resAdjust = False
-
     for coin in coins[:]:   #COINCOIN
         coin.draw(screen)
         if player.rect.colliderect(coin.rect):
             coins.remove(coin)
-            score += 1  #
+            score += 1
             print(f"Score: {score}")
             coin_sound.play()
 
+    if menu:
+        actionCount, help, menuTicker, hrznRes, vertRes, resAdjust = drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust)
+
+    if (width != hrznRes or height != vertRes) and resAdjust == True:
+        width, height = hrznRes, vertRes
+        widthMulti, heightMulti = (width / 1000), (height / 850)
+        JUMP_HEIGHT, Y_GRAVITY, X_SPEED, meteor_min_size, meteor_max_size = int(20 * heightMulti), int(
+            1 * heightMulti), int(5 * widthMulti), int(20 * heightMulti), int(50 * heightMulti)
+        world = World(world_data)
+        resAdjust = False
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
