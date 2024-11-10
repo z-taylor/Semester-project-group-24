@@ -127,24 +127,17 @@ def drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust):
     menuTitleRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 0), itemWidth, doubleItemHeight)
     resolutionRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 2), itemWidth, itemHeight)
     hrznResRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 3), (smallItemWidth * 18), itemHeight)
-    hrznResUpRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 18), menuBaseRect.top + (itemHeight * 3),
-                                smallItemWidth, itemHeight)
-    hrznResDnRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 19), menuBaseRect.top + (itemHeight * 3),
-                                smallItemWidth, itemHeight)
+    hrznResUpRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 18), menuBaseRect.top + (itemHeight * 3),smallItemWidth, itemHeight)
+    hrznResDnRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 19), menuBaseRect.top + (itemHeight * 3),smallItemWidth, itemHeight)
     vertResRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 4), (smallItemWidth * 18), itemHeight)
-    vertResUpRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 18), menuBaseRect.top + (itemHeight * 4),
-                                smallItemWidth, itemHeight)
-    vertResDnRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 19), menuBaseRect.top + (itemHeight * 4),
-                                smallItemWidth, itemHeight)
+    vertResUpRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 18), menuBaseRect.top + (itemHeight * 4),smallItemWidth, itemHeight)
+    vertResDnRect = pygame.Rect(menuBaseRect.left + (smallItemWidth * 19), menuBaseRect.top + (itemHeight * 4),smallItemWidth, itemHeight)
     resAdjustRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 5), itemWidth, itemHeight)
     helpRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 6), itemWidth, itemHeight)
     exitRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 9), itemWidth, itemHeight)
-    helpTitleRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 0), (smallItemWidth * 19),
-                                doubleItemHeight)
-    helpTitleRect_ = pygame.Rect((menuBaseRect.right - smallItemWidth), menuBaseRect.top + (itemHeight * 1),
-                                 (smallItemWidth * 1), itemHeight)
-    helpTitleXrect = pygame.Rect((menuBaseRect.right - smallItemWidth), menuBaseRect.top + (itemHeight * 0),
-                                 (smallItemWidth * 1), itemHeight)
+    #helpTitleRect = pygame.Rect(menuBaseRect.left, menuBaseRect.top + (itemHeight * 0), (smallItemWidth * 19),doubleItemHeight)
+    #helpTitleRect_ = pygame.Rect((menuBaseRect.right - smallItemWidth), menuBaseRect.top + (itemHeight * 1),(smallItemWidth * 1), itemHeight)
+    #helpTitleXrect = pygame.Rect((menuBaseRect.right - smallItemWidth), menuBaseRect.top + (itemHeight * 0),(smallItemWidth * 1), itemHeight)
 
     if not help:
         # menu title
@@ -214,14 +207,14 @@ def drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust):
             actionCount += 1
 
         # Help
-        pygame.draw.rect(menuSurf, (
-            (150, 150, 150, 255) if helpRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)),
-                         helpRect)
-        helpText = menuFont.render(f"Help", True, pygame.Color('White'))
-        menuSurf.blit(helpText, (helpRect.x + 2, helpRect.y + 2))
-        if helpRect.collidepoint(mouse) and mouseButtons[0] and (actionCount < 1 or menuTicker > 60):
-            help = True
-            actionCount += 1
+        #pygame.draw.rect(menuSurf, (
+        #    (150, 150, 150, 255) if helpRect.collidepoint(mouse) and not mouseButtons[0] else (100, 100, 100, 255)),
+        #                 helpRect)
+        #helpText = menuFont.render(f"Help", True, pygame.Color('White'))
+        #menuSurf.blit(helpText, (helpRect.x + 2, helpRect.y + 2))
+        #if helpRect.collidepoint(mouse) and mouseButtons[0] and (actionCount < 1 or menuTicker > 60):
+        #    help = True
+        #    actionCount += 1
 
         # Exit
         pygame.draw.rect(menuSurf, (
@@ -232,22 +225,21 @@ def drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust):
         if exitRect.collidepoint(mouse) and mouseButtons[0] and (actionCount < 1 or menuTicker > 60):
             pygame.event.post(pygame.event.Event(pygame.QUIT))
             actionCount += 1
-    else:
-        # help menu title
-        pygame.draw.rect(menuSurf, (100, 100, 100, 255), helpTitleRect)
-        pygame.draw.rect(menuSurf, (100, 100, 100, 255), helpTitleRect_)
-        helpTitleText = doubleMenuFont.render("Help menu", True, pygame.Color('White'))
-        menuSurf.blit(helpTitleText, (helpTitleRect.x + 2, helpTitleRect.y + 2))
-        pygame.draw.rect(menuSurf, (
-            (150, 150, 150, 255) if helpTitleXrect.collidepoint(mouse) and not mouseButtons[0] else (
-                100, 100, 100, 255)), helpTitleXrect)
-        helpTitleXtext = menuFont.render("X", True, pygame.Color('White'))
-        text_width, text_height = helpTitleXtext.get_size()
-        menuSurf.blit(helpTitleXtext, ((helpTitleXrect.left + (helpTitleXrect.width - text_width) / 2),
-                                       (helpTitleXrect.top + (helpTitleXrect.height - text_height) / 2)))
-        if helpTitleXrect.collidepoint(mouse) and mouseButtons[0] and (actionCount < 1 or menuTicker > 60):
-            help = False
-            actionCount += 1
+    #else:
+    #    # help menu title
+    #    pygame.draw.rect(menuSurf, (100, 100, 100, 255), helpTitleRect)
+    #    pygame.draw.rect(menuSurf, (100, 100, 100, 255), helpTitleRect_)
+    #    helpTitleText = doubleMenuFont.render("Help menu", True, pygame.Color('White'))
+    #    menuSurf.blit(helpTitleText, (helpTitleRect.x + 2, helpTitleRect.y + 2))
+    #    pygame.draw.rect(menuSurf, (
+    #        (150, 150, 150, 255) if helpTitleXrect.collidepoint(mouse) and not mouseButtons[0] else (
+    #            100, 100, 100, 255)), helpTitleXrect)
+    #    helpTitleXtext = menuFont.render("X", True, pygame.Color('White'))
+    #    text_width, text_height = helpTitleXtext.get_size()
+    #    menuSurf.blit(helpTitleXtext, ((helpTitleXrect.left + (helpTitleXrect.width - text_width) / 2), (helpTitleXrect.top + (helpTitleXrect.height - text_height) / 2)))
+    #    if helpTitleXrect.collidepoint(mouse) and mouseButtons[0] and (actionCount < 1 or menuTicker > 60):
+    #        help = False
+    #        actionCount += 1
     screen.blit(menuSurf, (0, 0))
     return actionCount, help, menuTicker, hrznRes, vertRes, resAdjust
 
@@ -496,17 +488,18 @@ while running:
 
     ticker += 1
     clock.tick(60)
-    pygame.mouse.set_visible(game_over)
     if game_over:
         coins.clear()
         meteors.clear()
         reset, quit = drawGameOver(reset, quit)
+        pygame.mouse.set_visible(game_over)
     pygame.display.flip()
     if quit:
         break
     if reset:
         game_over = not game_over
         reset = not reset
+        pygame.mouse.set_visible(game_over)
         score = 0
         player = Player(3.125, 770.3125)
         coins = [Coin(100 * widthMulti, 500 * heightMulti), Coin(300 * widthMulti, 400 * heightMulti),
