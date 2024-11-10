@@ -1,17 +1,7 @@
-# HARD REQUIREMENTS
-# Must use at least 10 different Surface objects.
-# If the game is some sort of puzzle, the puzzle must be solvable, and the game must acknowledge that the puzzle has been solved.
-# If the game has win and lose conditions, those must be implemented.
-# Either of the above must either close the game or allow the user to restart it
-# SOFT REQUIREMENTS
-# Game instructions are present in the game and are in correct English
-# Game does not crash or stall
-# Game shows no obvious flaws, such as dropped inputs or rogue Surfaces
 import pygame, random, sys, tkinter as tk
 from pygame.locals import *
 
 # get the resolution of the active display, then get scaling factors
-# to go back to windowed, remove this function, remove all instances of the widthMulti, heightMulti, and scaleFactor variables, and remove "pygame.FULLSCREEN" from line 40
 root = tk.Tk()
 width, height, hrznRes, vertRes = root.winfo_screenwidth(), root.winfo_screenheight(), root.winfo_screenwidth(), root.winfo_screenheight()
 root.destroy()
