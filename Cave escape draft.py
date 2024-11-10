@@ -64,10 +64,9 @@ def drawGameOver(reset, quit):
     gameOverScoreSurf = pygame.Surface((gameOverScoreText.get_width(), smallHeight), pygame.SRCALPHA)
     gameOverResetSurf = pygame.Surface((gameOverResetText.get_width(), smallHeight), pygame.SRCALPHA)
     gameOverQuitSurf = pygame.Surface((gameOverQuitText.get_width(), smallHeight), pygame.SRCALPHA)
-    collisionRect1 = pygame.Rect((width / 2 - gameOverResetText.get_width() / 2), smallHeight * 3,
-                                 gameOverResetText.get_width(), smallHeight)
-    collisionRect2 = pygame.Rect((width / 2 - gameOverQuitText.get_width() / 2), smallHeight * 4,
-                                 gameOverQuitText.get_width(), smallHeight)
+    
+    collisionRect1 = pygame.Rect((width / 2 - gameOverResetText.get_width() / 2), smallHeight * 3,gameOverResetText.get_width(), smallHeight)
+    collisionRect2 = pygame.Rect((width / 2 - gameOverQuitText.get_width() / 2), smallHeight * 4,gameOverQuitText.get_width(), smallHeight)
 
     gameOverTitleSurf.fill((0, 0, 0, 0))
     gameOverScoreSurf.fill((0, 0, 0, 0))
@@ -105,8 +104,7 @@ def drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust):
         menuTicker += 1
     menuSurf = pygame.Surface((width, height), pygame.SRCALPHA)
     menuSurf.fill((0, 0, 0, 128))
-    menuBaseRect = pygame.Rect(int(width / 4), int(height / 4), int(width / 2),
-                               int(height / 2))  # each menu item height will be height/24
+    menuBaseRect = pygame.Rect(int(width / 4), int(height / 4), int(width / 2),int(height / 2))  # each menu item height will be height/24
     pygame.draw.rect(menuSurf, (255, 255, 255, 255), menuBaseRect)
 
     itemWidth = menuBaseRect.width
