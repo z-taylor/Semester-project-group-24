@@ -453,8 +453,7 @@ while running:
             coin_sound.play()
 
     if menu:
-        actionCount, help, menuTicker, hrznRes, vertRes, resAdjust = drawMenu(actionCount, help, menuTicker, hrznRes,
-                                                                              vertRes, resAdjust)
+        actionCount, help, menuTicker, hrznRes, vertRes, resAdjust = drawMenu(actionCount, help, menuTicker, hrznRes, vertRes, resAdjust)
 
     if (width != hrznRes or height != vertRes) and resAdjust == True:
         width, height = hrznRes, vertRes
